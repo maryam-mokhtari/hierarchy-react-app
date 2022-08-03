@@ -39,12 +39,13 @@ const App = () => {
     const key = keys[index];
 
     const result = {
-      ...data,
-      [key]: {
-        ...(index === keys.length - 1
-          ? null
-          : removeNode(data[key], keys, index + 1)),
-      },
+      ...Object.keys(data).reduce(
+        (s, k) => ({ ...s, ...(k !== key ? { [k]: data[k] } : null) }),
+        {}
+      ),
+      ...(index !== keys.length - 1
+        ? { [key]: removeNode(data[key], keys, index + 1) }
+        : null),
     };
     return result;
   };
@@ -66,7 +67,10 @@ const App = () => {
 
   const Node = ({ data, keys, nodeKey }) => {
     const newKeys = keys ? `${keys}-${nodeKey}` : nodeKey;
+
+    // "arrow", "plus" and "minus" are shown just for folders:
     const isFolder = !nodeKey.includes(".");
+
     const [isShown, setIsShown] = useState(true);
 
     const toggle = (e) => {
